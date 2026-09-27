@@ -9375,7 +9375,7 @@
       "device_id": "DEV-CUCME-RTR-01",
       "device_hostname": "CUCME-RTR-01",
       "vendor": "Cisco Systems",
-      "status": "BACKLOG",
+      "status": "IN_PROGRESS",
       "priority": "LOW",
       "reporter_uid": "FIREBASE_UID_SUPERADMIN_01",
       "assignee_uid": "FIREBASE_UID_OPERATOR_03",
@@ -9386,7 +9386,7 @@
       "remediation_script": "! Fix 3: Apply Management Access Control List to VTY lines\nip access-list standard MGMT-ACL\n permit 10.0.100.0 0.0.0.255\nline vty 0 4\n access-class MGMT-ACL in",
       "comments": [],
       "created_at": "2026-09-07T11:24:29Z",
-      "updated_at": "2026-09-07T11:51:42Z"
+      "updated_at": "2026-09-25T18:18:10Z"
     },
     {
       "task_id": "TASK-2026-464B",
@@ -11314,6 +11314,26 @@
     }
   ],
   "audit_logs": [
+    {
+      "log_id": "LOG-C5C59E",
+      "user_uid": "FIREBASE_UID_SUPERADMIN_01",
+      "user_email": "admin@vectornet.io",
+      "user_role": "SUPER_ADMIN",
+      "action_type": "SKILL_RULE_TRAINED",
+      "resource_affected": "skills/custom_vendor.md",
+      "ip_address": "127.0.0.1",
+      "timestamp": "2026-09-25T18:20:03Z"
+    },
+    {
+      "log_id": "LOG-82A68B",
+      "user_uid": "FIREBASE_UID_SUPERADMIN_01",
+      "user_email": "admin@vectornet.io",
+      "user_role": "SUPER_ADMIN",
+      "action_type": "TASK_UPDATED",
+      "resource_affected": "tasks/TASK-2026-8BDB",
+      "ip_address": "127.0.0.1",
+      "timestamp": "2026-09-25T18:18:10Z"
+    },
     {
       "log_id": "LOG-9B71EB",
       "user_uid": "FIREBASE_UID_SUPERADMIN_01",
