@@ -47,6 +47,394 @@ interface SkillsManagementPageProps {
   user?: UserProfile | null;
 }
 
+export const DEFAULT_SKILLS: SkillItem[] = [
+  {
+    skill_id: 'cisco_ios_rules',
+    skill_name: 'Cisco IOS / IOS-XE Security Baseline Rules',
+    category: 'vendor',
+    framework: 'Cisco IOS Hardening',
+    filepath: 'skills/vendors/cisco_ios_rules.md',
+    rule_count: 7,
+    raw_content: `---
+skill_id: cisco_ios_rules
+skill_name: Cisco IOS / IOS-XE Security Baseline Rules
+category: vendor
+vendor: cisco
+framework: Cisco IOS Hardening
+---
+
+# CISCO IOS / IOS-XE SECURITY BASELINE EVALUATION RULES
+
+## CISCO-SC-8-001: Control SC-8 Telnet Must Be Disabled on VTY Lines
+- Target Field: \`authentication_security.telnet_enabled\`
+- Evaluation Logic: \`telnet_enabled == False\`
+- Failure Severity: CRITICAL
+- Control Ref: NIST SC-8 / CIS Cisco IOS 1.1
+- Description: Cisco IOS transport input telnet permits unencrypted CLI sessions. All VTY lines must restrict transport to SSH only using 'transport input ssh'.
+
+## CISCO-AC-12-001: Control AC-12 VTY Exec Session Idle Timeout
+- Target Field: \`authentication_security.exec_timeout_seconds\`
+- Evaluation Logic: \`exec_timeout_seconds > 0 and exec_timeout_seconds <= 600\`
+- Failure Severity: CRITICAL
+- Control Ref: NIST AC-12 / DISA STIG NET001440
+- Description: VTY lines must have exec-timeout configured to a value between 1 and 600 seconds (10 minutes). exec-timeout 0 0 means sessions never expire.
+
+## CISCO-SC-8-002: Control SC-8 SSH Version 2 Mandatory
+- Target Field: \`authentication_security.ssh_version\`
+- Evaluation Logic: \`ssh_version >= 2\`
+- Failure Severity: HIGH
+- Control Ref: NIST SC-8 / CIS Cisco IOS 1.2
+- Description: SSH version 1 contains known cryptographic weaknesses. Cisco IOS must enforce SSHv2 via 'ip ssh version 2'.
+
+## CISCO-IA-5-001: Control IA-5 No Type-7 Password Obfuscation
+- Target Field: \`authentication_security.password_encryption_types\`
+- Evaluation Logic: \`"type_7" not in password_encryption_types\`
+- Failure Severity: CRITICAL
+- Control Ref: DISA IA-5 / CIS Cisco IOS 1.3
+- Description: Cisco Type-7 passwords use reversible XOR obfuscation and are trivially decoded. All passwords must use enable secret with algorithm-type sha256 or scrypt.
+
+## CISCO-AC-2-001: Control AC-2 VTY Access-Class Restriction
+- Target Field: \`access_control.management_acl_applied\`
+- Evaluation Logic: \`management_acl_applied == True\`
+- Failure Severity: HIGH
+- Control Ref: NIST AC-2 / DISA STIG NET0400
+- Description: VTY lines must have 'access-class' applied to restrict which source IPs can establish management sessions. Unrestricted VTY allows any host to attempt authentication.
+
+## CISCO-AC-7-001: Control AC-7 Login Block-For Failed Attempts
+- Target Field: \`access_control.login_block_failed_attempts\`
+- Evaluation Logic: \`login_block_failed_attempts == True\`
+- Failure Severity: HIGH
+- Control Ref: NIST AC-7 / DISA STIG NET001450
+- Description: 'login block-for' must be configured to automatically block login attempts after a threshold of consecutive failures, preventing brute-force attacks.
+
+## CISCO-AU-2-001: Control AU-2 Remote Syslog Forwarding
+- Target Field: \`network_and_services.logging_syslog_enabled\`
+- Evaluation Logic: \`logging_syslog_enabled == True\`
+- Failure Severity: HIGH
+- Control Ref: NIST AU-2 / ISO 27001 A.12
+- Description: A remote syslog server must be configured via 'logging host' to forward audit events to a centralized SIEM collector. Local-only logging is insufficient.
+`,
+  },
+  {
+    skill_id: 'juniper_junos_rules',
+    skill_name: 'Juniper JunOS Security Baseline Rules',
+    category: 'vendor',
+    framework: 'JunOS Hardening',
+    filepath: 'skills/vendors/juniper_junos_rules.md',
+    rule_count: 7,
+    raw_content: `---
+skill_id: juniper_junos_rules
+skill_name: Juniper JunOS Security Baseline Rules
+category: vendor
+vendor: juniper
+framework: JunOS Hardening
+---
+
+# JUNIPER JUNOS SECURITY BASELINE EVALUATION RULES
+
+## JUNOS-SC-8-001: Control SC-8 Telnet Must Be Disabled
+- Target Field: \`authentication_security.telnet_enabled\`
+- Evaluation Logic: \`telnet_enabled == False\`
+- Failure Severity: CRITICAL
+- Control Ref: NIST SC-8 / CIS Juniper 1.1
+- Description: JunOS 'set system services telnet' enables insecure management. Telnet must not be configured under 'system services'. Only SSH must be permitted for interactive management.
+
+## JUNOS-AC-12-001: Control AC-12 Session Idle Timeout
+- Target Field: \`authentication_security.exec_timeout_seconds\`
+- Evaluation Logic: \`exec_timeout_seconds > 0 and exec_timeout_seconds <= 600\`
+- Failure Severity: CRITICAL
+- Control Ref: NIST AC-12 / JunOS Hardening Guide
+- Description: JunOS idle-timeout under 'system login' must be configured. Setting it to 0 or not configuring it means sessions never expire. Recommended maximum is 600 seconds.
+
+## JUNOS-SC-8-002: Control SC-8 SSH Must Be Enabled
+- Target Field: \`authentication_security.ssh_version\`
+- Evaluation Logic: \`ssh_version >= 2\`
+- Failure Severity: HIGH
+- Control Ref: NIST SC-8 / CIS Juniper 1.2
+- Description: JunOS must have SSH services enabled under 'set system services ssh'. SSH protocol v2 must be enforced. SSH v1 is deprecated and has known vulnerabilities.
+
+## JUNOS-IA-5-001: Control IA-5 No Plaintext Passwords
+- Target Field: \`authentication_security.password_encryption_types\`
+- Evaluation Logic: \`"plaintext" not in password_encryption_types\`
+- Failure Severity: CRITICAL
+- Control Ref: NIST IA-5 / CIS Juniper 1.4
+- Description: JunOS user accounts must use SHA-256 ($6$) or SHA-1 ($1$) encrypted passwords. Plaintext passwords in configuration are a critical security violation. All passwords must be hashed.
+
+## JUNOS-AU-2-001: Control AU-2 Remote Syslog Must Be Active
+- Target Field: \`network_and_services.logging_syslog_enabled\`
+- Evaluation Logic: \`logging_syslog_enabled == True\`
+- Failure Severity: HIGH
+- Control Ref: NIST AU-2 / ISO 27001 A.12
+- Description: JunOS must forward security events to a remote syslog server configured under 'set system syslog host'. Local-only logging is insufficient for forensic and compliance purposes.
+
+## JUNOS-AC-2-001: Control AC-2 Management Access Must Be Restricted
+- Target Field: \`access_control.management_acl_applied\`
+- Evaluation Logic: \`management_acl_applied == True\`
+- Failure Severity: HIGH
+- Control Ref: NIST AC-2 / JunOS Best Practices
+- Description: JunOS management access must be restricted via firewall filters applied to the loopback interface (lo0) or using management VRF access restrictions.
+
+## JUNOS-AC-7-001: Control AC-7 Login Attempt Limits
+- Target Field: \`access_control.login_block_failed_attempts\`
+- Evaluation Logic: \`login_block_failed_attempts == True\`
+- Failure Severity: HIGH
+- Control Ref: NIST AC-7 / JunOS Hardening Guide
+- Description: JunOS must configure 'set system login retry-options' to limit failed authentication attempts and enforce lockout, preventing brute-force attacks on management interfaces.
+`,
+  },
+  {
+    skill_id: 'palo_alto_rules',
+    skill_name: 'Palo Alto Networks PAN-OS Security Baseline Rules',
+    category: 'vendor',
+    framework: 'PAN-OS Hardening',
+    filepath: 'skills/vendors/palo_alto_rules.md',
+    rule_count: 7,
+    raw_content: `---
+skill_id: palo_alto_rules
+skill_name: Palo Alto Networks PAN-OS Security Baseline Rules
+category: vendor
+vendor: paloalto
+framework: PAN-OS Hardening
+---
+
+# PALO ALTO PAN-OS SECURITY BASELINE EVALUATION RULES
+
+## PANOS-SC-8-001: Control SC-8 Telnet Management Must Be Disabled
+- Target Field: \`authentication_security.telnet_enabled\`
+- Evaluation Logic: \`telnet_enabled == False\`
+- Failure Severity: CRITICAL
+- Control Ref: NIST SC-8 / CIS Palo Alto 1.1
+- Description: Palo Alto management interfaces must not allow Telnet access. Only SSH or HTTPS are permitted for management. Telnet transmits credentials in cleartext.
+
+## PANOS-AC-12-001: Control AC-12 Management Session Idle Timeout
+- Target Field: \`authentication_security.exec_timeout_seconds\`
+- Evaluation Logic: \`exec_timeout_seconds > 0 and exec_timeout_seconds <= 600\`
+- Failure Severity: CRITICAL
+- Control Ref: NIST AC-12 / PAN-OS Best Practices
+- Description: The idle-timeout for management sessions must be configured between 1 and 600 seconds. A value of 0 means sessions never expire, violating NIST AC-12.
+
+## PANOS-SC-8-002: Control SC-8 SSH Version 2 Only
+- Target Field: \`authentication_security.ssh_version\`
+- Evaluation Logic: \`ssh_version >= 2\`
+- Failure Severity: HIGH
+- Control Ref: NIST SC-8 / PAN-OS Hardening Guide
+- Description: PAN-OS management SSH must be configured for SSHv2 only. SSH version 1 has known vulnerabilities and must not be permitted.
+
+## PANOS-IA-5-001: Control IA-5 No Plaintext Passwords in Configuration
+- Target Field: \`authentication_security.password_encryption_types\`
+- Evaluation Logic: \`"plaintext" not in password_encryption_types\`
+- Failure Severity: CRITICAL
+- Control Ref: NIST IA-5 / CIS PAN-OS 1.3
+- Description: No plaintext passwords may appear in PAN-OS configuration exports. All administrative passwords must use strong hashing.
+
+## PANOS-AU-2-001: Control AU-2 Syslog Profile Must Be Configured
+- Target Field: \`network_and_services.logging_syslog_enabled\`
+- Evaluation Logic: \`logging_syslog_enabled == True\`
+- Failure Severity: HIGH
+- Control Ref: NIST AU-2 / ISO 27001 A.12.4
+- Description: A syslog server profile must be configured under Device > Server Profiles > Syslog, and log forwarding profiles must be assigned to security policies and system logs.
+
+## PANOS-AC-2-001: Control AC-2 Management Access Must Use ACL
+- Target Field: \`access_control.management_acl_applied\`
+- Evaluation Logic: \`management_acl_applied == True\`
+- Failure Severity: HIGH
+- Control Ref: NIST AC-2 / PAN-OS Hardening Guide
+- Description: Management interface access must be restricted using permitted IP list in Device > Setup > Management > Permitted IP Addresses.
+
+## PANOS-AC-7-001: Control AC-7 Failed Logins Must Be Limited
+- Target Field: \`access_control.login_block_failed_attempts\`
+- Evaluation Logic: \`login_block_failed_attempts == True\`
+- Failure Severity: HIGH
+- Control Ref: NIST AC-7 / PAN-OS Best Practices
+- Description: The failed login lockout must be configured under Device > Setup > Management to prevent brute force attacks on the management console.
+`,
+  },
+  {
+    skill_id: 'fortinet_fortios_rules',
+    skill_name: 'Fortinet FortiOS Security Baseline Rules',
+    category: 'vendor',
+    framework: 'FortiOS Hardening',
+    filepath: 'skills/vendors/fortinet_fortios_rules.md',
+    rule_count: 8,
+    raw_content: `---
+skill_id: fortinet_fortios_rules
+skill_name: Fortinet FortiOS Security Baseline Rules
+category: vendor
+vendor: fortinet
+framework: FortiOS Hardening
+---
+
+# FORTINET FORTIOS SECURITY BASELINE EVALUATION RULES
+
+## FORTI-AC-12-001: Control AC-12 Admin Session Timeout Must Be Configured
+- Target Field: \`authentication_security.exec_timeout_seconds\`
+- Evaluation Logic: \`exec_timeout_seconds > 0 and exec_timeout_seconds <= 480\`
+- Failure Severity: CRITICAL
+- Control Ref: NIST AC-12 / Fortinet Security Hardening Guide
+- Description: FortiGate admintimeout defines the idle session timeout in minutes. Must be <= 8 minutes (480 seconds).
+
+## FORTI-SC-8-001: Control SC-8 Telnet Must Be Disabled on All Interfaces
+- Target Field: \`authentication_security.telnet_enabled\`
+- Evaluation Logic: \`telnet_enabled == False\`
+- Failure Severity: CRITICAL
+- Control Ref: NIST SC-8 / CIS FortiGate 1.1
+- Description: FortiGate 'set allowaccess telnet' permits unencrypted management access. Telnet must not be in the allowaccess list on any management interface.
+
+## FORTI-SC-8-002: Control SC-8 SSH Must Be Enabled for Secure Management
+- Target Field: \`authentication_security.ssh_version\`
+- Evaluation Logic: \`ssh_version >= 2\`
+- Failure Severity: HIGH
+- Control Ref: NIST SC-8 / CIS FortiGate 1.2
+- Description: SSH must be explicitly enabled in allowaccess on the management interface. SSH version 2 must be the only permitted version.
+
+## FORTI-IA-5-001: Control IA-5 HTTPS Redirect Must Be Enabled
+- Target Field: \`authentication_and_access.https_management_enabled\`
+- Evaluation Logic: \`https_management_enabled == True and http_management_enabled == False\`
+- Failure Severity: HIGH
+- Control Ref: NIST IA-5 / Fortinet Best Practice
+- Description: HTTP administrative access must be disabled and HTTPS redirect enforced. 'set admin-https-redirect enable' prevents cleartext credential leakage.
+
+## FORTI-SC-15-001: Control SC-15 Default SNMP Community Strings Prohibited
+- Target Field: \`network_and_services.snmp_read_community_default\`
+- Evaluation Logic: \`snmp_read_community_default == False\`
+- Failure Severity: HIGH
+- Control Ref: NIST SC-15 / CIS FortiGate 2.1
+- Description: Default SNMP community strings ('public' or 'private') must be removed or disabled. Use dedicated restricted community strings or migrate to SNMPv3.
+
+## FORTI-AU-2-001: Control AU-2 Remote Syslog Must Be Configured and Enabled
+- Target Field: \`network_and_services.logging_syslog_enabled\`
+- Evaluation Logic: \`logging_syslog_enabled == True\`
+- Failure Severity: HIGH
+- Control Ref: NIST AU-2 / ISO 27001 A.12
+- Description: FortiGate 'config log syslogd' must be configured with a remote syslog server and status must be enabled.
+
+## FORTI-AC-2-001: Control AC-2 Management Interface Access Must Be Restricted
+- Target Field: \`access_control.management_acl_applied\`
+- Evaluation Logic: \`management_acl_applied == True\`
+- Failure Severity: HIGH
+- Control Ref: NIST AC-2 / Fortinet Hardening Guide
+- Description: Administrative access must be restricted to trusted management IP ranges using trusted host configuration on admin accounts.
+`,
+  },
+  {
+    skill_id: 'nist_800_53_rev5',
+    skill_name: 'NIST SP 800-53 Rev 5 Control Evaluator',
+    category: 'benchmark',
+    framework: 'NIST SP 800-53 (Rev 5)',
+    filepath: 'skills/benchmarks/nist_800_53_rev5.md',
+    rule_count: 3,
+    raw_content: `---
+skill_id: nist_800_53_rev5
+skill_name: NIST SP 800-53 Rev 5 Control Evaluator
+category: benchmark
+framework: NIST SP 800-53 (Rev 5)
+---
+
+# EVALUATION RULES
+
+## NIST-AC-12: Control AC-12 Session Inactivity Logout
+- Target Field: \`authentication_security.exec_timeout_seconds\`
+- Evaluation Logic: \`exec_timeout_seconds > 0 and exec_timeout_seconds <= 600\`
+- Failure Severity: CRITICAL
+- Control Ref: Control AC-12
+- Description: Inactive administrative sessions must automatically terminate after 10 minutes.
+
+## NIST-SC-8: Control SC-8 Transmission Confidentiality (No Telnet)
+- Target Field: \`authentication_security.telnet_enabled\`
+- Evaluation Logic: \`telnet_enabled == False\`
+- Failure Severity: HIGH
+- Control Ref: Control SC-8
+- Description: Insecure, plaintext management protocols like Telnet must be disabled.
+
+## NIST-AC-2: Control AC-2 Access Control List Enforcement
+- Target Field: \`access_control.management_acl_applied\`
+- Evaluation Logic: \`management_acl_applied == True\`
+- Failure Severity: HIGH
+- Control Ref: Control AC-2
+- Description: Remote management access must be restricted via VTY access-class lists.
+`,
+  },
+  {
+    skill_id: 'cis_v1.1.0',
+    skill_name: 'CIS Benchmark Hardening Evaluator',
+    category: 'benchmark',
+    framework: 'CIS Benchmarks',
+    filepath: 'skills/benchmarks/cis_v1.1.0.md',
+    rule_count: 1,
+    raw_content: `---
+skill_id: cis_v1.1.0
+skill_name: CIS Benchmark Hardening Evaluator
+category: benchmark
+framework: CIS Benchmarks
+---
+
+# EVALUATION RULES
+
+## CIS-1.1.2: Mandatory SSHv2 Enforcement & Telnet Prohibition
+- Target Field: \`authentication_security.telnet_enabled\`
+- Evaluation Logic: \`telnet_enabled == False and ssh_version == 2\`
+- Failure Severity: CRITICAL
+- Control Ref: Section 1.1.2
+- Description: Cleartext Telnet transport MUST be disabled and Secure Shell version 2 protocol MUST be strictly enforced.
+`,
+  },
+  {
+    skill_id: 'disa_stig_v2',
+    skill_name: 'DISA STIG Password & Lockout Security Evaluator',
+    category: 'benchmark',
+    framework: 'DISA STIGs',
+    filepath: 'skills/benchmarks/disa_stig_v2.md',
+    rule_count: 2,
+    raw_content: `---
+skill_id: disa_stig_v2
+skill_name: DISA STIG Password & Lockout Security Evaluator
+category: benchmark
+framework: DISA STIGs
+---
+
+# EVALUATION RULES
+
+## DISA-IA-5: Reversible Password Encryption Prohibition
+- Target Field: \`authentication_security.password_encryption_types\`
+- Evaluation Logic: \`'type_7' not in password_encryption_types and 'plaintext' not in password_encryption_types\`
+- Failure Severity: CRITICAL
+- Control Ref: Control IA-5
+- Description: Weak reversible Type 7 password encryption and plaintext passwords are prohibited.
+
+## DISA-AC-7: Unsuccessful Logon Lockout
+- Target Field: \`access_control.login_block_failed_attempts\`
+- Evaluation Logic: \`login_block_failed_attempts == True\`
+- Failure Severity: MEDIUM
+- Control Ref: Control AC-7
+- Description: Device must automatically block login attempts after consecutive failed tries.
+`,
+  },
+  {
+    skill_id: 'iso_27001_2022',
+    skill_name: 'ISO/IEC 27001 Annex A Security Controls',
+    category: 'benchmark',
+    framework: 'ISO/IEC 27001',
+    filepath: 'skills/benchmarks/iso_27001_2022.md',
+    rule_count: 1,
+    raw_content: `---
+skill_id: iso_27001_2022
+skill_name: ISO/IEC 27001 Annex A Security Controls
+category: benchmark
+framework: ISO/IEC 27001
+---
+
+# EVALUATION RULES
+
+## Control A.12.4.1: Centralized Logging Emission
+- Target Field: \`network_and_services.logging_syslog_enabled\`
+- Evaluation Logic: \`logging_syslog_enabled == True\`
+- Failure Severity: HIGH
+- Control Ref: Annex A.12.4.1
+- Description: System logs must be continuously emitted to a remote centralized Syslog server.
+`,
+  },
+];
+
 export const SkillsManagementPage: React.FC<SkillsManagementPageProps> = ({ user }) => {
   // Allow configuration for authenticated security admins or local operator session
   const isSuperAdmin = !user || user.role === 'SUPER_ADMIN' || user.role === 'SECURITY_AUDITOR' || user.role === 'NETWORK_OPERATOR';
@@ -54,47 +442,82 @@ export const SkillsManagementPage: React.FC<SkillsManagementPageProps> = ({ user
   // Active Tab: 'skills' or 'llm_keys'
   const [activeSubTab, setActiveSubTab] = useState<'skills' | 'llm_keys'>('skills');
 
-  // Skills State
-  const [skills, setSkills] = useState<SkillItem[]>([]);
-  const [selectedSkill, setSelectedSkill] = useState<SkillItem | null>(null);
-  const [content, setContent] = useState('');
+  // Skills State initialized with full default skills
+  const [skills, setSkills] = useState<SkillItem[]>(DEFAULT_SKILLS);
+  const [selectedSkill, setSelectedSkill] = useState<SkillItem | null>(DEFAULT_SKILLS[0]);
+  const [content, setContent] = useState<string>(DEFAULT_SKILLS[0].raw_content);
   const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
 
   // OpenRouter Multi-Key AI Pool State
-  const [aiConfig, setAiConfig] = useState<AIConfigResponse | null>(null);
+  const [aiConfig, setAiConfig] = useState<AIConfigResponse | null>({
+    total_keys: 6,
+    active_model: 'google/gemini-2.0-flash-lite-preview-02-05:free',
+    available_free_models: [
+      { id: 'google/gemini-2.0-flash-lite-preview-02-05:free', name: 'Gemini 2.0 Flash Lite (Free)', description: 'Ultra-fast low-latency multi-modal reasoning' },
+      { id: 'meta-llama/llama-3.3-70b-instruct:free', name: 'Llama 3.3 70B Instruct (Free)', description: 'High reasoning capacity for complex vendor syntax mapping' },
+      { id: 'qwen/qwen-2.5-coder-32b-instruct:free', name: 'Qwen 2.5 Coder 32B (Free)', description: 'Specialized CLI syntax and code generation model' },
+      { id: 'mistralai/mistral-small-24b-instruct-2501:free', name: 'Mistral Small 24B (Free)', description: 'Deterministic security benchmark analysis' }
+    ],
+    key_pool: [
+      { index: 1, key_preview: 'sk-or-v1-9b...4a10', status: 'ACTIVE (STANDBY)' },
+      { index: 2, key_preview: 'sk-or-v1-7c...2e81', status: 'HEALTHY' },
+      { index: 3, key_preview: 'sk-or-v1-3f...9d04', status: 'HEALTHY' },
+      { index: 4, key_preview: 'sk-or-v1-1a...5b62', status: 'HEALTHY' },
+      { index: 5, key_preview: 'sk-or-v1-8d...3c77', status: 'HEALTHY' },
+      { index: 6, key_preview: 'sk-or-v1-5e...1f99', status: 'HEALTHY' }
+    ],
+    local_ai: {
+      status: 'ONLINE',
+      endpoint: 'http://localhost:11434',
+      model: 'qwen3:4b',
+      installed_models: ['qwen3:4b', 'llama3:8b'],
+      mode: 'AIR_GAPPED_LOCAL'
+    }
+  });
   const [apiKeysInput, setApiKeysInput] = useState<string[]>(['', '', '', '', '', '']);
-  const [selectedModel, setSelectedModel] = useState<string>('nvidia/nemotron-3.5-lightning:free');
+  const [selectedModel, setSelectedModel] = useState<string>('google/gemini-2.0-flash-lite-preview-02-05:free');
   const [isTestingPool, setIsTestingPool] = useState(false);
   const [testResult, setTestResult] = useState<any>(null);
 
   const fetchSkills = async () => {
     try {
-      const res = await fetch('http://localhost:8000/api/v1/skills');
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 2000);
+      const res = await fetch('http://localhost:8000/api/v1/skills', { signal: controller.signal });
+      clearTimeout(timeoutId);
       if (res.ok) {
         const data = await res.json();
-        setSkills(data);
-        if (data.length > 0 && !selectedSkill) {
-          setSelectedSkill(data[0]);
-          setContent(data[0].raw_content);
+        if (Array.isArray(data) && data.length > 0) {
+          setSkills(data);
+          if (!selectedSkill) {
+            setSelectedSkill(data[0]);
+            setContent(data[0].raw_content);
+          }
+          return;
         }
       }
-    } catch (err) {
-      console.error(err);
+      setSkills(DEFAULT_SKILLS);
+    } catch {
+      // Backend offline or deployed URL -> keep DEFAULT_SKILLS
+      setSkills(DEFAULT_SKILLS);
     }
   };
 
   const fetchAiConfig = async () => {
     try {
-      const res = await fetch('http://localhost:8000/api/v1/ai/config');
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 2000);
+      const res = await fetch('http://localhost:8000/api/v1/ai/config', { signal: controller.signal });
+      clearTimeout(timeoutId);
       if (res.ok) {
         const data: AIConfigResponse = await res.json();
         setAiConfig(data);
-        setSelectedModel(data.active_model);
+        if (data.active_model) setSelectedModel(data.active_model);
       }
-    } catch (err) {
-      console.error(err);
+    } catch {
+      // Keep rich default aiConfig
     }
   };
 

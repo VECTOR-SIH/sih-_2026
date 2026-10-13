@@ -13,10 +13,12 @@ import {
   X,
   Settings,
   History,
+  FolderDown,
+  ExternalLink,
 } from 'lucide-react';
 import { UserProfile } from '../modals/AuthModal';
 
-export type NavTab = 'overview' | 'ingestion' | 'history' | 'auditor' | 'workbench' | 'remediation' | 'tasks' | 'skills' | 'reports' | 'settings';
+export type NavTab = 'overview' | 'ingestion' | 'history' | 'auditor' | 'workbench' | 'remediation' | 'tasks' | 'skills' | 'reports' | 'downloads' | 'settings';
 
 interface SidebarProps {
   activeTab: NavTab;
@@ -141,6 +143,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
       roles: ['SUPER_ADMIN', 'SECURITY_AUDITOR', 'NETWORK_OPERATOR', 'VIEWER'],
     },
     {
+      id: 'downloads' as NavTab,
+      label: 'Sample Configs',
+      icon: FolderDown,
+      roles: ['SUPER_ADMIN', 'SECURITY_AUDITOR', 'NETWORK_OPERATOR', 'VIEWER'],
+    },
+    {
       id: 'settings' as NavTab,
       label: 'Settings',
       icon: Settings,
@@ -229,6 +237,43 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       <div className="space-y-2 pt-2">
+        {/* Persistent Sample Configs / Google Drive Download Card */}
+        <div className="bg-orange-50/70 border border-orange-200/90 rounded-xl p-2.5 space-y-1.5">
+          <div className="flex items-center justify-between">
+            <span className="flex items-center gap-1.5 text-[10px] font-bold text-orange-950 font-mono uppercase tracking-wider">
+              <FolderDown className="w-3.5 h-3.5 text-orange-600" />
+              <span>TEST DATASETS</span>
+            </span>
+            <span className="text-[9px] font-mono text-orange-800 bg-orange-100 px-1.5 py-0.2 rounded border border-orange-200">
+              SIH 2026
+            </span>
+          </div>
+          <p className="text-[10px] text-slate-600 leading-tight">
+            Benchmark multi-vendor configs for evaluation.
+          </p>
+          <div className="flex items-center gap-1.5 pt-0.5">
+            <button
+              type="button"
+              onClick={() => {
+                onSelectTab('downloads');
+                if (isMobile) setMobileOpen(false);
+              }}
+              className="flex-1 text-center py-1 px-1.5 bg-white hover:bg-slate-50 border border-orange-200 text-slate-800 rounded text-[10px] font-medium transition-colors"
+            >
+              View Hub
+            </button>
+            <a
+              href="https://drive.google.com/drive/folders/1TY6I3fmB93jGXdZJuPXU9AXoURNfWqlt?usp=sharing"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-1 inline-flex items-center justify-center gap-1 py-1 px-1.5 bg-orange-600 hover:bg-orange-700 text-white rounded text-[10px] font-medium transition-colors"
+            >
+              <span>Drive</span>
+              <ExternalLink className="w-2.5 h-2.5 opacity-80" />
+            </a>
+          </div>
+        </div>
+
         {/* Local AI Engine Status Card */}
         <div className="bg-slate-50 border border-slate-200 rounded-xl p-2.5 space-y-1">
           <div className="text-[10px] font-mono text-slate-500 uppercase tracking-wider flex items-center justify-between">

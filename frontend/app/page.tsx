@@ -13,7 +13,10 @@ import {
   SkillsManagementPage,
   SettingsPage,
   HistoryPage,
+  DownloadsPage,
   AuthModal,
+  PrototypeNoticeModal,
+  VisitorCounter,
 } from '../components';
 import type { NavTab, UserProfile } from '../lib/types';
 
@@ -30,6 +33,7 @@ export default function AppContainer() {
   // User Auth & RBAC State (Dynamic Database & LocalStorage session)
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
+  const [isPrototypeNoticeOpen, setIsPrototypeNoticeOpen] = useState<boolean>(false);
 
   const handleUserLogin = (user: UserProfile) => {
     setCurrentUser(user);
@@ -223,6 +227,13 @@ export default function AppContainer() {
           setCurrentUser(JSON.parse(saved));
         }
       } catch {}
+
+      try {
+        const hideNotice = localStorage.getItem('vectornet_hide_prototype_notice');
+        if (hideNotice !== 'true') {
+          setIsPrototypeNoticeOpen(true);
+        }
+      } catch {}
     }
 
     fetch('http://localhost:8000/api/inventory')
@@ -353,7 +364,23 @@ export default function AppContainer() {
             onNavigate={setActiveTab}
           />
         )}
+
+        {activeTab === 'downloads' && (
+          <DownloadsPage
+            onLoadConfig={(cfg) => {
+              setRawConfig(cfg);
+              detectVendorLocally(cfg);
+              if (cfg.trim()) {
+                handleEvaluate(cfg);
+              }
+            }}
+            onNavigate={setActiveTab}
+          />
+        )}
       </main>
+
+      {/* Floating Bottom-Right Visitor Counter */}
+      <VisitorCounter />
 
       {/* Auth & RBAC Modal */}
       <AuthModal
@@ -361,6 +388,16 @@ export default function AppContainer() {
         onClose={() => setIsAuthModalOpen(false)}
         onLoginSuccess={handleUserLogin}
         currentUser={currentUser}
+      />
+
+      {/* Prototype Notice & Evaluation Modal */}
+      <PrototypeNoticeModal
+        isOpen={isPrototypeNoticeOpen}
+        onClose={() => setIsPrototypeNoticeOpen(false)}
+        onNavigateToDownloads={() => {
+          setIsPrototypeNoticeOpen(false);
+          setActiveTab('downloads');
+        }}
       />
 
     </div>

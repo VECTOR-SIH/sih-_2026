@@ -24,6 +24,7 @@ export type NavTab =
   | 'reports' 
   | 'tasks' 
   | 'skills'
+  | 'downloads'
   | 'settings';
 
 export type ComplianceStatus = 'PASS' | 'FAIL' | 'WARNING' | 'UNKNOWN' | 'NOT_APPLICABLE' | 'ERROR';

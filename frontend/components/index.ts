@@ -7,6 +7,7 @@
 // Layout Components
 export { Sidebar } from './layout/Sidebar';
 export { PostureHeader } from './layout/PostureHeader';
+export { VisitorCounter } from './layout/VisitorCounter';
 
 // View Modules
 export { IngestionPage, IngestionPage as IngestionView } from './views/IngestionView';
@@ -19,10 +20,12 @@ export { RemediationPage, RemediationPage as RemediationView } from './views/Rem
 export { WorkbenchPage, WorkbenchPage as WorkbenchView } from './views/WorkbenchView';
 export { SettingsPage, SettingsPage as SettingsView } from './views/SettingsView';
 export { HistoryPage, HistoryPage as HistoryView } from './views/HistoryView';
+export { DownloadsView, DownloadsView as DownloadsPage } from './views/DownloadsView';
 
 // Modals
 export { AuthModal } from './modals/AuthModal';
 export { PdfExportModal } from './modals/PdfExportModal';
+export { PrototypeNoticeModal } from './modals/PrototypeNoticeModal';
 
 // Widgets
 export { AuditMatrix } from './widgets/AuditMatrix';
