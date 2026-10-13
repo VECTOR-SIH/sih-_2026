@@ -237,42 +237,22 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       <div className="space-y-2 pt-2">
-        {/* Persistent Sample Configs / Google Drive Download Card */}
-        <div className="bg-orange-50/70 border border-orange-200/90 rounded-xl p-2.5 space-y-1.5">
-          <div className="flex items-center justify-between">
-            <span className="flex items-center gap-1.5 text-[10px] font-bold text-orange-950 font-mono uppercase tracking-wider">
-              <FolderDown className="w-3.5 h-3.5 text-orange-600" />
-              <span>TEST DATASETS</span>
-            </span>
-            <span className="text-[9px] font-mono text-orange-800 bg-orange-100 px-1.5 py-0.2 rounded border border-orange-200">
-              SIH 2026
-            </span>
-          </div>
-          <p className="text-[10px] text-slate-600 leading-tight">
-            Benchmark multi-vendor configs for evaluation.
-          </p>
-          <div className="flex items-center gap-1.5 pt-0.5">
-            <button
-              type="button"
-              onClick={() => {
-                onSelectTab('downloads');
-                if (isMobile) setMobileOpen(false);
-              }}
-              className="flex-1 text-center py-1 px-1.5 bg-white hover:bg-slate-50 border border-orange-200 text-slate-800 rounded text-[10px] font-medium transition-colors"
-            >
-              View Hub
-            </button>
-            <a
-              href="https://drive.google.com/drive/folders/1TY6I3fmB93jGXdZJuPXU9AXoURNfWqlt?usp=sharing"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex-1 inline-flex items-center justify-center gap-1 py-1 px-1.5 bg-orange-600 hover:bg-orange-700 text-white rounded text-[10px] font-medium transition-colors"
-            >
-              <span>Drive</span>
-              <ExternalLink className="w-2.5 h-2.5 opacity-80" />
-            </a>
-          </div>
-        </div>
+        {/* Google Drive Test Configs Button */}
+        <a
+          href="https://drive.google.com/drive/folders/1TY6I3fmB93jGXdZJuPXU9AXoURNfWqlt?usp=sharing"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center justify-between px-3 py-2 bg-orange-50 hover:bg-orange-100 border border-orange-200 rounded-xl text-xs font-semibold text-orange-950 transition-colors group"
+        >
+          <span className="flex items-center gap-2">
+            <FolderDown className="w-4 h-4 text-orange-600" />
+            <span>Sample Configs</span>
+          </span>
+          <span className="flex items-center gap-1 text-[10px] text-orange-700 font-mono font-normal">
+            <span>Drive</span>
+            <ExternalLink className="w-3 h-3" />
+          </span>
+        </a>
 
         {/* Local AI Engine Status Card */}
         <div className="bg-slate-50 border border-slate-200 rounded-xl p-2.5 space-y-1">
