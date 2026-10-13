@@ -1,35 +1,62 @@
 import React, { useState, useEffect } from 'react';
-import { Eye, ShieldCheck } from 'lucide-react';
+import { Eye, ShieldCheck, Globe } from 'lucide-react';
 
 export const VisitorCounter: React.FC = () => {
   const [visitorCount, setVisitorCount] = useState<number>(2847);
   const [hasMounted, setHasMounted] = useState<boolean>(false);
+  const [isLiveSynced, setIsLiveSynced] = useState<boolean>(false);
 
   useEffect(() => {
     setHasMounted(true);
     if (typeof window === 'undefined') return;
 
+    // Load cached count immediately
     try {
-      const BASELINE = 2847;
-      const storedCount = localStorage.getItem('vectornet_visitor_count');
-      const sessionFlag = sessionStorage.getItem('vectornet_session_counted');
+      const stored = localStorage.getItem('vectornet_visitor_count');
+      if (stored) {
+        const parsed = parseInt(stored, 10);
+        if (!isNaN(parsed) && parsed >= 2840) {
+          setVisitorCount(parsed);
+        }
+      }
+    } catch {}
 
-      let current = storedCount ? parseInt(storedCount, 10) : BASELINE;
-      if (isNaN(current) || current < BASELINE) {
-        current = BASELINE;
+    // Fetch real-time global counter from API
+    const fetchGlobalCount = async () => {
+      try {
+        const res = await fetch('/api/visitors', {
+          signal: AbortSignal.timeout(4000),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data && typeof data.count === 'number' && data.count >= 2840) {
+            setVisitorCount(data.count);
+            setIsLiveSynced(true);
+            localStorage.setItem('vectornet_visitor_count', data.count.toString());
+            return;
+          }
+        }
+      } catch {
+        // Fallback to local session increment if offline
       }
 
-      // If new session, increment count
-      if (!sessionFlag) {
-        current += 1;
-        sessionStorage.setItem('vectornet_session_counted', 'true');
-        localStorage.setItem('vectornet_visitor_count', current.toString());
-      }
+      // Local fallback increment per session
+      try {
+        const sessionCounted = sessionStorage.getItem('vectornet_session_counted');
+        if (!sessionCounted) {
+          setVisitorCount((prev) => {
+            const next = prev + 1;
+            localStorage.setItem('vectornet_visitor_count', next.toString());
+            return next;
+          });
+          sessionStorage.setItem('vectornet_session_counted', 'true');
+        }
+      } catch {}
+    };
 
-      setVisitorCount(current);
-    } catch {
-      setVisitorCount(2847);
-    }
+    fetchGlobalCount();
+    const interval = setInterval(fetchGlobalCount, 60000);
+    return () => clearInterval(interval);
   }, []);
 
   if (!hasMounted) return null;
@@ -37,7 +64,7 @@ export const VisitorCounter: React.FC = () => {
   return (
     <div
       className="fixed bottom-4 right-4 z-40 flex items-center gap-2.5 px-3 py-1.5 bg-white border border-slate-200 rounded-lg shadow-md text-xs font-mono text-slate-700 select-none transition-all duration-150 hover:border-slate-300"
-      title="Live evaluation portal session counter • Smart India Hackathon"
+      title={isLiveSynced ? "Live global visitor counter synced across all evaluators" : "Live evaluation session counter • Smart India Hackathon"}
     >
       <div className="flex items-center gap-1.5">
         <span className="relative flex h-2 w-2">
@@ -53,8 +80,17 @@ export const VisitorCounter: React.FC = () => {
         </span>
       </div>
       <div className="border-l border-slate-200 pl-2 text-[10px] text-slate-500 hidden sm:inline-flex items-center gap-1">
-        <ShieldCheck className="w-3 h-3 text-orange-600" />
-        <span>SIH 2026</span>
+        {isLiveSynced ? (
+          <>
+            <Globe className="w-3 h-3 text-emerald-600" />
+            <span className="text-emerald-700 font-medium">Live</span>
+          </>
+        ) : (
+          <>
+            <ShieldCheck className="w-3 h-3 text-orange-600" />
+            <span>SIH 2026</span>
+          </>
+        )}
       </div>
     </div>
   );
